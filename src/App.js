@@ -1,23 +1,28 @@
-import logo from './logo.svg';
 import './App.css';
+import { useEffect, useRef, useState } from 'react';
+import WebViewer from '@pdftron/webviewer';
 
 function App() {
+  const viewer = useRef(null);
+  const [instance, setInstance] = useState(null);
+
+  useEffect(() => {
+    WebViewer(
+      {
+        path: '/webviewer/lib',
+        initialDoc: '/files/WebviewerDemoDoc.pdf',
+        licenseKey: "demo:1688745488452:7c640dad0300000000ff98c75e9e3a6477a0d966fddd63ac8543da906b",
+        fullAPI: true
+      },
+      viewer.current,
+    ).then((instance) => {
+      setInstance(instance);
+    });
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="webviewer" ref={viewer}></div>
     </div>
   );
 }
