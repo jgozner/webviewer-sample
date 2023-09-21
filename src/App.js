@@ -2,10 +2,6 @@ import './App.css';
 import { useEffect, useRef, useState } from 'react';
 import WebViewer, { WebViewerInstance } from '@pdftron/webviewer';
 
-function timeout(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 function App() {
   const viewer = useRef(null);
 
@@ -18,12 +14,11 @@ function App() {
       },
       viewer.current,
     ).then((instance) => {
-      const {documentViewer, annotationManager, PDFNet, Annotations, Search } = instance.Core;
-      const { TextExtractor  } = PDFNet;
+      const {documentViewer, annotationManager, PDFNet, Annotations, Math} = instance.Core;
+      const { TextExtractor, Rect  } = PDFNet;
 
 
       documentViewer.addEventListener("documentLoaded", async () => {
-
         await PDFNet.initialize();
         //Extract Text
         const document = await documentViewer.getDocument();
@@ -47,8 +42,13 @@ function App() {
               const wordText = await word.getString();
 
               if (wordText.trim().length > 0){
+                const wordQuad = await word.getQuad();
+                const wordRect = await word.getBBox();
+
                 documentWords[i].push({
-                  text: wordText
+                  text: wordText,
+                  quad: wordQuad,
+                  rect: wordRect
                 })
               }
             }
@@ -56,42 +56,28 @@ function App() {
         }
 
         //highlight words
+        for(const [key, value] of Object.entries(documentWords)){
+          const pageNumber = key;
+          const words = value;
 
-        console.log(documentWords)
-     
-        for(var pageNumber = 1; pageNumber <= pageCount; pageNumber++){
+          for(var w = 0; w < words.length; w++){
+              const word = words[w];
 
-          if(!documentWords[pageNumber]) continue;
-
-          for(var k = 0; k < documentWords[pageNumber].length; k++){
-            
-            const searchText = documentWords[pageNumber][k].text;
-            const mode = Search.Mode.PAGE_STOP | Search.Mode.HIGHLIGHT
-            const searchOptions = {
-              // If true, a search of the entire document will be performed. Otherwise, a single search will be performed.
-              fullSearch: true,
-              startPage: pageNumber,
-              endPage: pageNumber,
-              // The callback function that is called when the search returns a result.
-              onResult: result => {
-                // with 'PAGE_STOP' mode, the callback is invoked after each page has been searched.
-                if (result.resultCode === Search.ResultCode.FOUND) {
-                  const textQuad = result.quads[0].getPoints(); // getPoints will return Quad objects
-                  const annot = new Annotations.TextHighlightAnnotation({
-                    PageNumber: result.pageNum,
-                    Quads: [textQuad],
-                    StrokeColor: new Annotations.Color(0, 255, 0, 1),
-                  });
-                  annotationManager.addAnnotation(annot);
-                  annotationManager.redrawAnnotation(annot);
-                }
-              }
-            };
-        
-            documentViewer.textSearchInit(searchText, mode, searchOptions);
-
-            await timeout(200);
+              const annot = new Annotations.TextHighlightAnnotation({
+                PageNumber: pageNumber,
+                Quads: [new Math.Quad(
+                  word.quad.p1x, word.quad.p1y,
+                  word.quad.p2x, word.quad.p2y, 
+                  word.quad.p3x, word.quad.p3y,
+                  word.quad.p4x, word.quad.p4y
+                )],
+                StrokeColor: new Annotations.Color(0, 255, 0, 1),
+              });
+              annot.setContents(word.text)
+              annotationManager.addAnnotation(annot);
+              annotationManager.redrawAnnotation(annot);
           }
+          break;
         }
     
       });
