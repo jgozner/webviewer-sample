@@ -15,17 +15,17 @@ function App() {
       viewer.current,
     ).then((instance) => {
       const {documentViewer, annotationManager, PDFNet, Annotations, Math} = instance.Core;
-      const { TextExtractor, Rect  } = PDFNet;
-
+      const { TextExtractor  } = PDFNet;
 
       documentViewer.addEventListener("documentLoaded", async () => {
         await PDFNet.initialize();
+        console.log("Extracting text")
         //Extract Text
         const document = await documentViewer.getDocument();
         const pdfDoc = await document.getPDFDoc();
         const pageCount = await pdfDoc.getPageCount();
         const txtExtractor = await TextExtractor.create();
-        await txtExtractor.setRightToLeftLanguage(true);
+        //await txtExtractor.setRightToLeftLanguage(true);
 
         const documentWords = {};
 
@@ -55,31 +55,33 @@ function App() {
           }
         }
 
+        console.log("Highlighting words")
         //highlight words
         for(const [key, value] of Object.entries(documentWords)){
           const pageNumber = key;
           const words = value;
+          const page = await pdfDoc.getPage(Number(pageNumber));
 
           for(var w = 0; w < words.length; w++){
-              const word = words[w];
-
-              const annot = new Annotations.TextHighlightAnnotation({
-                PageNumber: pageNumber,
-                Quads: [new Math.Quad(
-                  word.quad.p1x, word.quad.p1y,
-                  word.quad.p2x, word.quad.p2y, 
-                  word.quad.p3x, word.quad.p3y,
-                  word.quad.p4x, word.quad.p4y
-                )],
-                StrokeColor: new Annotations.Color(0, 255, 0, 1),
-              });
-              annot.setContents(word.text)
-              annotationManager.addAnnotation(annot);
-              annotationManager.redrawAnnotation(annot);
+            const word = words[w];
+            const rect = new PDFNet.Rect(word.rect.x1, word.rect.y1, word.rect.x2, word.rect.y2);
+            const hl = await PDFNet.HighlightAnnot.create(
+              pdfDoc,
+              rect
+            );
+            await hl.setColor(await PDFNet.ColorPt.init(0, 1, 0), 3);
+            await hl.refreshAppearance();
+            await page.annotPushBack(hl);
           }
-          break;
         }
-    
+
+        console.log("Saving document")
+        const buffer = await pdfDoc.saveMemoryBuffer(PDFNet.SDFDoc.SaveOptions.e_linearized);
+
+        // save document
+        const blob = new Blob([buffer], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        window.open(url);
       });
     });
   }, []);
