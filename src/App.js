@@ -4,19 +4,74 @@ import WebViewer from '@pdftron/webviewer';
 
 function App() {
   const viewer = useRef(null);
-  const [instance, setInstance] = useState(null);
+  
+  let rooms = [];
+  let roomId = 1;
+
+
+  //Check if annotation is inside a room
+  const checkIfAnnotationIsInRoom = (instance, annotation) => {
+    for(var i = 0; i < rooms.length; i++){
+      const room = rooms[i];
+
+      const roomRect = room.getRect();
+      const annotationRect = annotation.getRect();
+      const annotationCenterPoint = annotationRect.getCenter();
+
+      //This checks if the center point of the annotation is within a room 
+      //This will allow us to ignore cases where the edge of an annotation 
+      //is in another room
+      const centerX = annotationCenterPoint.getX();
+      const centerY = annotationCenterPoint.getY();
+
+      if(centerX > roomRect.x1 && 
+         centerX < roomRect.x2 && 
+         centerY > roomRect.y1 &&
+         centerY < roomRect.y2){
+          annotation.setContents(`Linked to ${room.getContents()}`)
+          return;
+      }
+    }
+    //In the case we find no matches unlink the room
+    annotation.setContents("Unlinked");
+  }
 
   useEffect(() => {
     WebViewer(
       {
         path: '/webviewer/lib',
-        initialDoc: '/files/WebviewerDemoDoc.pdf',
-        licenseKey: "demo:1688745488452:7c640dad0300000000ff98c75e9e3a6477a0d966fddd63ac8543da906b",
-        fullAPI: true
+        initialDoc: '/files/Floorplan.pdf'
       },
       viewer.current,
-    ).then((instance) => {
-      setInstance(instance);
+    ).then(async(instance) => {
+
+      instance.UI.enableFeatures([instance.UI.Feature.Measurement]);
+
+      const { documentViewer, annotationManager, Annotations  } = instance.Core;
+      
+      annotationManager.addEventListener('annotationChanged', (annotations, action) => {
+        if (action === 'add') {
+          annotations.forEach((annot) => {
+            if(annot.Subject == "Polygon" || annot.Subject == "Polyline"){
+              //Ideally we would set the room id using setCustomData(key, value)
+              //we are overriding the area/perimeter using setContents for demo purposes  
+              annot.setContents(`Room ${roomId}`)
+              rooms.push(annot);
+              console.log(`Added Room ${roomId}`)
+              roomId++;
+            }else{
+              checkIfAnnotationIsInRoom(instance, annot)
+            }
+          });
+        } else if (action === 'modify') {
+          annotations.forEach((annot) => {
+            if(annot.Subject != "Polygon" && annot.Subject != "Polyline"){
+                checkIfAnnotationIsInRoom(instance, annot)
+            }
+          })
+        }
+      });
+
     });
   }, []);
 
@@ -28,3 +83,4 @@ function App() {
 }
 
 export default App;
+
