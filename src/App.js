@@ -83,9 +83,6 @@ function isIntersect(l1, l2)
 
 function checkInside(poly, p)
 {
- 
-
- 
     // Create a point at infinity, y is same as point p
     let tmp=new Point(9999, p.y);
     let exline = new line( p, tmp );
