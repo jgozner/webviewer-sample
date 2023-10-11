@@ -45,7 +45,7 @@ function App() {
       viewer.current,
     ).then((instance) => {
       setInstance(instance);
-      const {annotationManager, documentViewer, Annotations, createDocument, } = instance.Core;
+      const {annotationManager, documentViewer, Annotations, } = instance.Core;
 
       annotationManager.addEventListener('annotationChanged',(annotations, action) => {
         console.log(action)
