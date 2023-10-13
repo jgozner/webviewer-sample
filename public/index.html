@@ -24,6 +24,35 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
+
+     <!-- Babel Polyfill -->
+  <script src="https://fortifyapp.com/external/babel-polyfill/6.26.0/polyfill.min.js"></script>
+
+  <!-- Fetch Polyfill -->
+  <script
+    nomodule
+    src="https://fortifyapp.com/external/whatwg-fetch@3.0.0/fetch.umd.js"
+  ></script>
+
+  <!-- Crypto Polyfill -->
+  <script src="https://fortifyapp.com/external/asmCrypto/2.3.2/asmcrypto.all.es5.min.js"></script>
+  <script src="https://fortifyapp.com/external/elliptic/elliptic.min.js"></script>
+  <script type="module" src="https://fortifyapp.com/external/webcrypto-liner/1.2.3/webcrypto-liner.shim.min.mjs"></script>
+  <script nomodule src="https://fortifyapp.com/external/webcrypto-liner/1.2.3/webcrypto-liner.shim.min.js"></script>
+
+  <!-- WebCrypto Socket -->
+  <script src="https://fortifyapp.com/external/protobuf/6.8.0/protobuf.min.js"></script>
+  <script src="https://fortifyapp.com/external/webcrypto-local/client/1.7.1/webcrypto-socket.min.js"></script>
+
+  <!-- CMS -->
+  <script src="https://fortifyapp.com/external/pvtsutils/pvtsutils.js"></script>
+  <script src="https://fortifyapp.com/external/asn1js/asn1.min.js"></script>
+  <script src="https://fortifyapp.com/external/pkijs/pki.min.js"></script>
+
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@peculiar/fortify-webcomponents/dist/peculiar/peculiar.esm.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@peculiar/fortify-webcomponents/dist/peculiar/peculiar.css">
+
+
     <title>React App</title>
   </head>
   <body>

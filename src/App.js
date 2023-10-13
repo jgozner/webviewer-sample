@@ -1,30 +1,45 @@
+import { useState } from 'react';
 import './App.css';
-import { useEffect, useRef, useState } from 'react';
-import WebViewer from '@pdftron/webviewer';
+import { PeculiarFortifyCertificates } from '@peculiar/fortify-webcomponents-react';
 
 function App() {
-  const viewer = useRef(null);
-  const [instance, setInstance] = useState(null);
 
-  useEffect(() => {
-    WebViewer(
-      {
-        path: '/webviewer/lib',
-        initialDoc: '/files/WebviewerDemoDoc.pdf',
-        licenseKey: "demo:1688745488452:7c640dad0300000000ff98c75e9e3a6477a0d966fddd63ac8543da906b",
-        fullAPI: true
-      },
-      viewer.current,
-    ).then((instance) => {
-      setInstance(instance);
-    });
-  }, []);
+  const [signature, setSignature] = useState();
+
+  const handleContinue = async (event) => {
+    var provider = await event.detail.socketProvider.getCrypto(event.detail.providerId);
+    provider.sign = provider.subtle.sign.bind(provider.subtle);
+
+    var cert = await provider.certStorage.getItem(event.detail.certificateId);
+    var privateKey = await provider.keyStorage.getItem(event.detail.privateKeyId);
+    var certRawData = await provider.certStorage.exportCert('raw', cert);
+
+    const encoder = new TextEncoder();
+    const message = "This is a test message";
+
+    const signedContent = await provider.subtle.sign("RSASSA-PKCS1-v1_5", privateKey, encoder.encode(message));
+
+    setSignature(window.btoa(String.fromCharCode.apply(null, new Uint8Array(signedContent))))
+  }
 
   return (
     <div className="App">
-      <div className="webviewer" ref={viewer}></div>
+      <PeculiarFortifyCertificates
+                    id="fortify-certificates-wc"
+                    language="en"
+                    hideFooter
+                    filters={{ 
+                        onlySmartcards: true, 
+                        onlyWithPrivateKey: true,
+                    }}
+                    onSelectionSuccess={handleContinue}/>
+          <div style={{marginLeft: "40px"}}>
+            <div style={{marginBottom: "5px"}}>Signature</div>
+            <div style={{width: "200px", wordBreak:"break-all"}}>{signature}</div>
+          </div>
     </div>
   );
 }
+
 
 export default App;
