@@ -21,7 +21,7 @@ function App() {
   
         //pattern to search for using regex. Search for multiple strings with
         //format 'the|cat|Jackson'.
-        const pattern = 'PDF';
+        const pattern = 'Performance, Crashing, and Inaccurate Rendering';
   
         //the array holding all of the redaction info for each word to be redacted
         const redactionArray = [];
@@ -45,7 +45,7 @@ function App() {
   
                 //loops through all strings to redact, pushing quad info and page number to redaction array
                 while (await hlts.hasNext()) {
-                    const curPage = await doc.getPage(await hlts.getCurrentPageNumber());
+                    const curPageNum = await hlts.getCurrentPageNumber();
                     const quadArr = await hlts.getCurrentQuads();
                     //turns quads into data needed to create RECT object for redaction annotations
                     for (let i = 0; i < quadArr.length; ++i) {
@@ -55,14 +55,7 @@ function App() {
                         const y1 = Math.min(Math.min(Math.min(currQuad.p1y, currQuad.p2y), currQuad.p3y), currQuad.p4y);
                         const y2 = Math.max(Math.max(Math.max(currQuad.p1y, currQuad.p2y), currQuad.p3y), currQuad.p4y);
   
-                        const overlayfillcolor = await PDFNet.ColorPt.init(1,0,0);
-                        const redaction = await PDFNet.RedactionAnnot.create(doc, await PDFNet.Rect.init(x1, y1, x2, y2));
-                        redaction.setColor(overlayfillcolor, 3);
-                        redaction.setInteriorColor(overlayfillcolor, 3);
-                        redaction.setOpacity(.5);
-                        redaction.refreshAppearance();
-  
-                        await curPage.annotPushBack(redaction);
+                        redactionArray.push(await PDFNet.Redactor.redactionCreate(curPageNum, (await PDFNet.Rect.init(x1, y1, x2, y2)), false, ''));
                     }
                     await hlts.next();
                 }
@@ -70,7 +63,15 @@ function App() {
                 break;
             }
         }
-  
+
+        const appearance = {};
+        appearance.redaction_overlay = true;
+        appearance.border = false;
+        appearance.show_redacted_content_regions = true;
+        appearance.positive_overlay_color = await PDFNet.ColorPt.init(0,0,0);
+        
+        await PDFNet.Redactor.redact(doc, redactionArray, appearance, false, false);
+
         return doc;
   
   
