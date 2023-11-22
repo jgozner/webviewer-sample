@@ -21,7 +21,7 @@ function App() {
   
         //pattern to search for using regex. Search for multiple strings with
         //format 'the|cat|Jackson'.
-        const pattern = 'Performance, Crashing, and Inaccurate Rendering';
+        const pattern = 'PDF';
   
         //the array holding all of the redaction info for each word to be redacted
         const redactionArray = [];
