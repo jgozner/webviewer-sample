@@ -10,13 +10,15 @@ function App() {
     WebViewer(
       {
         path: '/webviewer/lib',
-        initialDoc: '/files/WebviewerDemoDoc.pdf',
+        //initialDoc: '/files/6bed62c2-fb17-4d4a-a4c1-794f69c73dfc.docx',
         licenseKey: "demo:1688745488452:7c640dad0300000000ff98c75e9e3a6477a0d966fddd63ac8543da906b",
         fullAPI: true
       },
       viewer.current,
     ).then((instance) => {
       setInstance(instance);
+
+      instance.UI.loadDocument("/files/6bed62c2-fb17-4d4a-a4c1-794f69c73dfc.docx")
     });
   }, []);
 
