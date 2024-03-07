@@ -17,6 +17,38 @@ function App() {
       viewer.current,
     ).then((instance) => {
       setInstance(instance);
+      const { UI, Core } = instance;
+      const { annotationManager } = Core;
+
+      const annotationMenuItems = UI.annotationPopup.getItems();
+      const lastMenuItem = annotationMenuItems[annotationMenuItems.length - 1];
+
+      UI.annotationPopup.add([{
+        type: 'actionButton',
+        img: 'icon-chevron-up',
+        title: "Send to Front",
+        onClick: () => {
+          const selectedAnnotations = annotationManager.getSelectedAnnotations();
+          
+          for (let anno of selectedAnnotations) {
+            annotationManager.bringToFront(anno);
+            annotationManager.redrawAnnotation(anno);
+          }
+        },
+      }, {
+        type: 'actionButton',
+        img: 'icon-chevron-down',
+        title: "Send to Back",
+        onClick: () => {
+          const selectedAnnotations = annotationManager.getSelectedAnnotations();
+          for (let anno of selectedAnnotations) {
+            annotationManager.bringToBack(anno);
+            annotationManager.redrawAnnotation(anno);
+          }
+        },
+      }], lastMenuItem.dataElement);
+
+
     });
   }, []);
 
