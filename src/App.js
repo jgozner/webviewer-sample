@@ -6,6 +6,10 @@ function App() {
   const viewer = useRef(null);
   const [instance, setInstance] = useState(null);
 
+  const toggleHotkeys = () => {
+    instance.UI.hotkeys.on(instance.UI.hotkeys.Keys.CTRL_Z);            
+    instance.UI.hotkeys.on(instance.UI.hotkeys.Keys.CTRL_Y);
+  }
   useEffect(() => {
     WebViewer(
       {
@@ -17,11 +21,15 @@ function App() {
       viewer.current,
     ).then((instance) => {
       setInstance(instance);
+
+      instance.UI.hotkeys.off(instance.UI.hotkeys.Keys.CTRL_Z);            
+      instance.UI.hotkeys.off(instance.UI.hotkeys.Keys.CTRL_Y);
     });
   }, []);
 
   return (
     <div className="App">
+      <button onClick={toggleHotkeys}>Toggle Hotkeys</button>
       <div className="webviewer" ref={viewer}></div>
     </div>
   );
