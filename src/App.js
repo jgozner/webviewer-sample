@@ -6,17 +6,24 @@ function App() {
   const viewer = useRef(null);
   const [instance, setInstance] = useState(null);
 
+  const configData = {
+    LOCKED_PAGES: [2,3,4]
+  };
+
   useEffect(() => {
     WebViewer(
       {
         path: '/webviewer/lib',
         initialDoc: '/files/WebviewerDemoDoc.pdf',
         licenseKey: "demo:1688745488452:7c640dad0300000000ff98c75e9e3a6477a0d966fddd63ac8543da906b",
-        fullAPI: true
+        fullAPI: true,
+        custom: JSON.stringify(configData),
+        config: "config.js"
       },
       viewer.current,
     ).then((instance) => {
       setInstance(instance);
+
     });
   }, []);
 
