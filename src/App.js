@@ -25,8 +25,8 @@ function App() {
       const { documentViewer, Tools } = instance.Core;
       
       // Cache original mouse event functions
-      Tools.RectangleCreateTool.prototype.__mouseLeftDown = Tools.RectangleCreateTool.prototype.mouseLeftDown;
-      Tools.LineCreateTool.prototype.__mouseLeftDown = Tools.LineCreateTool.prototype.mouseLeftDown;
+      Tools.Tool.prototype.__mouseLeftDown = Tools.Tool.prototype.mouseLeftDown;
+      Tools.Tool.prototype.__mouseLeftDown = Tools.Tool.prototype.mouseLeftDown;
       
       function getPageCoor(e) {
         var tool = documentViewer.getToolMode();
@@ -41,23 +41,23 @@ function App() {
       }
       
       //RectangleCreateTool 
-      Tools.RectangleCreateTool.prototype.mouseLeftDown = function(e) {
+      Tools.Tool.prototype.mouseLeftDown = function(e) {
         var coor = getPageCoor(e)
         // If pageNumber matches, stop propagating the event.
         if (coor && LOCKED_PAGES.indexOf(coor.pageNumber) > -1) {
           return;
         };
-        return Tools.RectangleCreateTool.prototype.__mouseLeftDown.apply(this, arguments);
+        return Tools.Tool.prototype.__mouseLeftDown.apply(this, arguments);
       }
 
       //Rectagle annotation 
-      Tools.LineCreateTool.prototype.mouseLeftDown = function(e) {
+      Tools.Tool.prototype.mouseLeftDown = function(e) {
         var coor = getPageCoor(e)
         // If pageNumber matches, stop propagating the event.
         if (coor && LOCKED_PAGES.indexOf(coor.pageNumber) > -1) {
           return;
         };
-        return Tools.LineCreateTool.prototype.__mouseLeftDown.apply(this, arguments);
+        return Tools.Tool.prototype.__mouseLeftDown.apply(this, arguments);
       }
 
       //Will need to do the following for all the other tools.
