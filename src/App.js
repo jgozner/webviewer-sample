@@ -48,6 +48,7 @@ function App() {
               if (result.resultCode === Search.ResultCode.FOUND) {
                 //Let's increase the padding of the all the quads
                 var quads = [];
+
                 for(var i = 0; i < result.quads.length; i++){
                   var quadPoint = result.quads[i].getPoints();
                   var quad = new Math.Quad(quadPoint.x1, quadPoint.y1, quadPoint.x2, quadPoint.y2, quadPoint.x3, quadPoint.y3, quadPoint.x4, quadPoint.y4);
@@ -56,6 +57,7 @@ function App() {
 
                   quads.push(newRect.toQuad())
                 }
+                
                 result.quads = quads;
                 searchResults.push(result);
                 resolve()
@@ -76,8 +78,11 @@ function App() {
       documentViewer.addEventListener('documentLoaded', async () => {
         await PDFNet.initialize();
 
+        instance.UI.openElements(['loadingModal']);
+
         const doc = await documentViewer.getDocument().getPDFDoc();
 
+        //Extract page text
         for(var pageIndex = 12; pageIndex < 14; pageIndex++){
           const firstPage = await doc.getPage(pageIndex);
     
@@ -118,11 +123,14 @@ function App() {
             pageItems[highlight.pageNumber].push(highlight.text)
           }
 
-          for (var key in pageItems) {
-            var searchTerm = pageItems[key].join(" ");
+          //display search results
+          for (const [key, value] of Object.entries(pageItems)) {
+            var searchTerm = value.join(" ");
             await searchDocument(searchTerm, key)
           }
    
+          instance.UI.closeElements(['loadingModal']);
+
           documentViewer.displayAdditionalSearchResults(searchResults);
 
           //Scroll to first page of the search item found
