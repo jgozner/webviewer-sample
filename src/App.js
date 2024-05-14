@@ -19,70 +19,7 @@ function App() {
       setInstance(instance);
 
       const { documentViewer, Math, Annotations, annotationManager } = instance.Core;
-/*
-      documentViewer.addEventListener("documentLoaded", async () => {
-        const doc = documentViewer.getDocument();
-        const searchTerm = "6 Important Factors  when Choosing a  PDF Library";
-        const pageNumber = 1; // page to parse
-        const pageText = await doc.loadPageText(pageNumber);
-        let startIndex = 0;
-        let endIndex = 0;
-        while (startIndex > -1) {
-          startIndex = pageText.indexOf(searchTerm, endIndex);
-          endIndex = startIndex + searchTerm.length;
-          // Get text position for each letter in the 'searchTerm' found
-          // 'quads' will contain an array for each character between the start and end indexes
-          const quads = await doc.getTextPosition(
-            pageNumber,
-            startIndex,
-            endIndex
-          );
-          const rects = quads
-            .filter((quad) => quad.x1 != undefined)
-            .map((quad) =>
-              new Math.Quad(
-                quad.x1,
-                quad.y1,
-                quad.x2,
-                quad.y2,
-                quad.x3,
-                quad.y3,
-                quad.x4,
-                quad.y4
-              ).toRect()
-            );
-          console.log(quads);
-          console.log(rects);
-          const newQuads = [];
-          let tempRect = null;
-          for (var i = 0; i < rects.length; i++) {
-            var rect = rects[i];
-            if (!tempRect) {
-              tempRect = new Math.Rect(rect.x1, rect.y1, rect.x2, rect.y2);
-              continue;
-            }
-            //Check if we are still on the same line or on a new line
-            const centerPoint = rect.getCenter();
-            if ((tempRect.y1 < centerPoint.y) & (tempRect.y2 > centerPoint.y)) {
-              tempRect.x2 = rect.x2;
-              tempRect.y2 = rect.y2;
-            } else {
-              newQuads.push(tempRect.toQuad());
-              tempRect = new Math.Rect(rect.x1, rect.y1, rect.x2, rect.y2);
-            }
-          }
-          newQuads.push(tempRect.toQuad());
-          console.log(newQuads);
-          const annot = new Annotations.TextHighlightAnnotation({
-            PageNumber: pageNumber,
-            Quads: newQuads,
-            StrokeColor: new Annotations.Color(255, 0, 0, 1),
-          });
-          annotationManager.addAnnotation(annot);
-          annotationManager.redrawAnnotation(annot);
-        }
-      });
-*/
+
       documentViewer.addEventListener('documentLoaded', async () => {
         const doc = documentViewer.getDocument();
         const searchTerm = '6 Important Factors when Choosing a PDF Library';
