@@ -64,7 +64,7 @@ function App() {
           const annot = new Annotations.TextHighlightAnnotation({
             PageNumber: pageNumber,
             Quads: newQuads,
-            StrokeColor: new Annotations.Color(255, 0, 0, 1),
+            StrokeColor: new Annotations.Color(255,255, 55, 1),
           });
           annotationManager.addAnnotation(annot);
           annotationManager.redrawAnnotation(annot);
