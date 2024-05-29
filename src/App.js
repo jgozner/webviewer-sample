@@ -1,7 +1,6 @@
 import './App.css';
 import { useEffect, useRef, useState } from 'react';
 import WebViewer from '@pdftron/webviewer';
-import { dataUriToBuffer } from 'data-uri-to-buffer';
 
 function App() {
   const viewer = useRef(null);
