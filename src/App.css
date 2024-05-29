@@ -8,3 +8,7 @@
 .webviewer {
   height: 100vh;
 }
+
+.selected-signature-row{
+  display: none !important;
+}

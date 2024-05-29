@@ -1,22 +1,35 @@
 import './App.css';
 import { useEffect, useRef, useState } from 'react';
 import WebViewer from '@pdftron/webviewer';
+import { dataUriToBuffer } from 'data-uri-to-buffer';
 
 function App() {
   const viewer = useRef(null);
-  const [instance, setInstance] = useState(null);
 
   useEffect(() => {
-    WebViewer(
+    WebViewer.WebComponent(
       {
         path: '/webviewer/lib',
-        initialDoc: '/files/WebviewerDemoDoc.pdf',
-        licenseKey: "demo:1688745488452:7c640dad0300000000ff98c75e9e3a6477a0d966fddd63ac8543da906b",
+        enableOfficeEditing: true,
         fullAPI: true
       },
       viewer.current,
-    ).then((instance) => {
-      setInstance(instance);
+    ).then(async (instance) => {
+      const { Core } = instance;
+
+      await Core.PDFNet.initialize();
+
+      const pdfdoc = await Core.PDFNet.PDFDoc.create();
+
+      const filePath = "./files/sample.txt"
+
+      const r = await fetch(filePath)
+      const blob = await r.blob()
+      const arrayBuffer = await blob.arrayBuffer();
+
+      await Core.PDFNet.Convert.fromTextWithBuffer(pdfdoc, arrayBuffer);
+
+      instance.UI.loadDocument(pdfdoc);
     });
   }, []);
 
