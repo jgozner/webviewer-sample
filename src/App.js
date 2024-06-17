@@ -5,23 +5,40 @@ import WebViewer from '@pdftron/webviewer';
 function App() {
   const viewer = useRef(null);
   const [instance, setInstance] = useState(null);
+  const [modified, setModified] = useState(false);
 
-  useEffect(() => {
-    WebViewer(
-      {
-        path: '/webviewer/lib',
-        initialDoc: '/files/WebviewerDemoDoc.pdf',
-        licenseKey: "demo:1688745488452:7c640dad0300000000ff98c75e9e3a6477a0d966fddd63ac8543da906b",
-        fullAPI: true
-      },
-      viewer.current,
-    ).then((instance) => {
-      setInstance(instance);
+  const initialState = useRef();
+
+useEffect(() => {
+  WebViewer(
+    {
+      path: '/webviewer/lib',
+      initialDoc: "/files/WebviewerDemoDoc (5).pdf"
+    },
+    viewer.current,
+  ).then((instance) => {
+    setInstance(instance);
+
+    const { documentViewer, annotationManager } = instance.Core
+
+    //Grab initial state of the document
+    documentViewer.addEventListener('documentLoaded', async () => {
+      const currentState = await annotationManager.exportAnnotations({ fields: false, widgets: false });
+      initialState.current = currentState;
     });
-  }, []);
+
+    //Check changes
+    annotationManager.addEventListener('annotationChanged', async () => {
+      const currentState = await annotationManager.exportAnnotations({ fields: false, widgets: false });
+      setModified(initialState.current != currentState)
+    });
+
+  });
+}, []);
 
   return (
     <div className="App">
+      <div className="header" style={{backgroundColor: modified ? "#D9381E" : "#00a5e4"}}>React sample</div>
       <div className="webviewer" ref={viewer}></div>
     </div>
   );
