@@ -10,13 +10,19 @@ function App() {
     WebViewer(
       {
         path: '/webviewer/lib',
-        initialDoc: '/files/WebviewerDemoDoc.pdf',
+        initialDoc: '/files/E-SIGNATURE CERTIFICATE - 2024-08-06T141806.215.pdf',
         licenseKey: "demo:1688745488452:7c640dad0300000000ff98c75e9e3a6477a0d966fddd63ac8543da906b",
         fullAPI: true
       },
       viewer.current,
-    ).then((instance) => {
+    ).then(async (instance) => {
       setInstance(instance);
+
+      const { VerificationOptions } = instance.UI;
+
+      const response = await fetch('files/aatl_20240812.fdf');
+      const trustListAsArrayBuffer = await response.arrayBuffer();
+      VerificationOptions.loadTrustList(trustListAsArrayBuffer)
     });
   }, []);
 
