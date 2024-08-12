@@ -10,9 +10,9 @@ function App() {
     WebViewer(
       {
         path: '/webviewer/lib',
-        initialDoc: '/files/WebviewerDemoDoc.pdf',
+        initialDoc: '/files/sample.docx',
         licenseKey: "demo:1688745488452:7c640dad0300000000ff98c75e9e3a6477a0d966fddd63ac8543da906b",
-        fullAPI: true
+        enableOfficeEditing: true,
       },
       viewer.current,
     ).then((instance) => {
