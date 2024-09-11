@@ -17,6 +17,45 @@ function App() {
       viewer.current,
     ).then((instance) => {
       setInstance(instance);
+
+      const { documentViewer, annotationManager, Annotations } = instance.Core;
+
+      documentViewer.addEventListener('documentLoaded', () => {
+          // set flags for multiline and required
+          const flags = new Annotations.WidgetFlags();
+          flags.set('Multiline', true);
+          //flags.set('Required', true);
+
+          // create a form field
+          const field = new Annotations.Forms.Field("some text field name", {
+            type: 'Tx',
+            defaultValue: "some placeholder default text value",
+            flags,
+          });
+
+          // create a widget annotation
+          const widgetAnnot = new Annotations.TextWidgetAnnotation(field);
+
+          // set position and size
+          widgetAnnot.PageNumber = 1;
+          widgetAnnot.X = 350;
+          widgetAnnot.Y = 150;
+          widgetAnnot.Width = 200;
+          widgetAnnot.Height = 100;
+          widgetAnnot.backgroundColor  = new Annotations.Color(0,128,0, 0.4);
+
+          widgetAnnot.border = new Annotations.Border({
+            color: new Annotations.Color(0,0,128),
+            width: 15,
+            cornerRadius: 15
+          });
+
+          //add the form field and widget annotation
+          annotationManager.getFieldManager().addField(field);
+          annotationManager.addAnnotation(widgetAnnot);
+          annotationManager.redrawAnnotation(widgetAnnot)
+      });
+
     });
   }, []);
 
