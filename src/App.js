@@ -4,20 +4,43 @@ import WebViewer from '@pdftron/webviewer';
 
 function App() {
   const viewer = useRef(null);
-  const [instance, setInstance] = useState(null);
 
   useEffect(() => {
     WebViewer(
       {
         path: '/webviewer/lib',
-        initialDoc: '/files/WebviewerDemoDoc.pdf',
-        licenseKey: "demo:1688745488452:7c640dad0300000000ff98c75e9e3a6477a0d966fddd63ac8543da906b",
-        fullAPI: true
+        initialDoc: "/files/Sample.pdf",
+        licenseKey: "demo:1701731196462:7ca228c103000000005e46581a1882b46379dc11c8003a58246516df04"
       },
       viewer.current,
-    ).then((instance) => {
-      setInstance(instance);
-    });
+    ).then(async (instance) => {
+
+      const { documentViewer, annotationManager } = instance.Core;
+
+      //Load XFDF
+      documentViewer.setDocumentXFDFRetriever(async () => {
+        const response = await fetch('path/to/annotation/server');
+        const xfdfString = await response.text();
+        return xfdfString;
+      });
+
+      const testButton = new instance.UI.Components.CustomButton({
+        dataElement: 'customButton',
+        title: 'Save XFDF',
+        onClick: () => {
+          annotationManager.exportAnnotations({ links: false, widgets: false }).then(xfdfString => {
+            //save xfdfString
+            console.log(xfdfString)
+          });
+        },
+        img: 'icon-save',
+      });
+      
+      // This can now be added to a modular header
+      const defaultHeader = instance.UI.getModularHeader('default-top-header')
+      defaultHeader.setItems([...defaultHeader.items, testButton]);
+
+    })
   }, []);
 
   return (
