@@ -2,16 +2,16 @@ import './App.css';
 import { useEffect, useRef, useState } from 'react';
 import WebViewer from '@pdftron/webviewer';
 
-function WVMounted({visible, file}) {
+function WVMounted({options}) {
   const viewer = useRef(null);
   const wvInstance = useRef();
 
 
   useEffect(() => {
-    if(file){
-        wvInstance.current.UI.loadDocument(file);
+    if(options.mountedFile){
+        wvInstance.current.UI.loadDocument(options.mountedFile);
     }
-  },[file])
+  },[options.mountedFile])
 
 
   useEffect(() => {
@@ -30,7 +30,7 @@ function WVMounted({visible, file}) {
   }, []);
 
   return (
-    <div className="webviewer" ref={viewer} style={{contentVisibility: visible ? "visible" : "hidden"}}></div>
+    <div className="webviewer" ref={viewer} style={{visibility: options.mountedFile ? "visible" : "hidden", height: options.mountedFile ? "100vh" : "0"}}></div>
   );
 }
 

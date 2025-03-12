@@ -2,7 +2,7 @@ import './App.css';
 import { useEffect, useRef, useState } from 'react';
 import WebViewer from '@pdftron/webviewer';
 
-function WVRegular ({file}) {
+function WVRegular ({options}) {
   const viewer = useRef(null);
   const wvInstance = useRef();
 
@@ -10,7 +10,7 @@ function WVRegular ({file}) {
     WebViewer.WebComponent(
       {
         path: '/webviewer/lib',
-        initialDoc: file,
+        initialDoc: options.regularFile,
         licenseKey: "demo:1688745488452:7c640dad0300000000ff98c75e9e3a6477a0d966fddd63ac8543da906b",
         preloadWorker: 'pdf'
       },
@@ -22,7 +22,7 @@ function WVRegular ({file}) {
   }, []);
 
   return (
-    <div className="webviewer" ref={viewer}></div>
+    <div className="webviewer" ref={viewer} style={{height: "100vh"}}></div>
   );
 }
 
