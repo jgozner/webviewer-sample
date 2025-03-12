@@ -1,28 +1,37 @@
 import './App.css';
 import { useEffect, useRef, useState } from 'react';
-import WebViewer from '@pdftron/webviewer';
+import WVMounted from './WVMounted';
+import WVRegular from './WVRegular';
 
 function App() {
-  const viewer = useRef(null);
-  const [instance, setInstance] = useState(null);
 
-  useEffect(() => {
-    WebViewer(
-      {
-        path: '/webviewer/lib',
-        initialDoc: '/files/WebviewerDemoDoc.pdf',
-        licenseKey: "demo:1688745488452:7c640dad0300000000ff98c75e9e3a6477a0d966fddd63ac8543da906b",
-        fullAPI: true
-      },
-      viewer.current,
-    ).then((instance) => {
-      setInstance(instance);
-    });
-  }, []);
+  const [mountedVisible, setMountedVisible] = useState(false);
+  const [regularVisible, setRegularVisible] = useState(false);
+  const [file, setFile] = useState(null)
+
+
+  const openFileMounted = () => {
+    setFile(null)
+    setMountedVisible(true);
+    setRegularVisible(false)
+    setFile("/files/40k_linearized.pdf")
+  }
+
+  const openFileRegular = () => {
+    setFile(null)
+    setMountedVisible(false);
+    setRegularVisible(true);
+    setFile("/files/40k_linearized.pdf")
+  }
 
   return (
     <div className="App">
-      <div className="webviewer" ref={viewer}></div>
+      <button onClick={openFileMounted}>Open File (WV Mounted)</button>
+      <button onClick={openFileRegular}>Open File (WV Regular)</button>
+      <WVMounted visible={mountedVisible} file={file}/>
+      {regularVisible && (
+        <WVRegular file={file}/>
+      )}
     </div>
   );
 }
