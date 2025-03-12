@@ -17,7 +17,7 @@ function WVRegular ({file}) {
       viewer.current,
     ).then((instance) => {
         wvInstance.current = instance;
-
+        instance.UI.setLayoutMode(instance.UI.LayoutMode.Continuous);
     });
   }, []);
 
