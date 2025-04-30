@@ -7,16 +7,52 @@ function App() {
   const [instance, setInstance] = useState(null);
 
   useEffect(() => {
-    WebViewer(
+    WebViewer.Iframe(
       {
         path: '/webviewer/lib',
         initialDoc: '/files/WebviewerDemoDoc.pdf',
-        licenseKey: "demo:1688745488452:7c640dad0300000000ff98c75e9e3a6477a0d966fddd63ac8543da906b",
+        enableRedaction: true,
+        ui: "legacy",
         fullAPI: true
       },
       viewer.current,
     ).then((instance) => {
-      setInstance(instance);
+
+
+      const { documentViewer, Tools } = instance.Core;
+      const document = instance.UI.iframeWindow.document;
+      const redactionTool = documentViewer.getTool(Tools.ToolNames.REDACTION);
+
+      const options = ['Option 1', 'Option 2', 'Option 3'];
+      //Set default here but could change this logic
+      redactionTool.defaults.OverlayText = options[0];
+      
+      instance.UI.setHeaderItems(header => {
+        const select = document.createElement('select');
+        // Loop through options and add to select
+        options.forEach((text, index) => {
+          const option = document.createElement('option');
+          option.value = text;
+          option.textContent = text;
+          select.appendChild(option);
+        });
+
+        select.addEventListener('change', function () {
+          const selectedValue = select.value;
+          redactionTool.defaults.OverlayText = selectedValue;
+        });
+  
+        const renderSelect = () =>  { return select };
+
+        const newCustomElement = {
+          type: 'customElement',
+          render: renderSelect,
+        };
+
+        const items = header.getHeader('toolbarGroup-Redact');
+        header.getHeader('toolbarGroup-Redact').get("redactionToolGroupButton").insertAfter(newCustomElement)
+      });
+
     });
   }, []);
 
