@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xfdf
+	xmlns="http://ns.adobe.com/xfdf/" xml:space="preserve">
+	<fields />
+	<annots>
+		<square page="0" rect="394.76,505.191,563.61,649.59" color="#C544CE" flags="print" name="af712a4c-1706-80fb-e0b4-4f07c59b3df5" title="Guest" subject="Rectangle" date="D:20250722151300-07'00'" interior-color="#C544CE" creationdate="D:20250722151254-07'00'"/>
+		<circle page="0" rect="136.25,201.272,286.47,366.62" color="#C544CE" flags="print" name="07578084-13a4-d5c8-0493-71ec73b8d30e" title="Guest" subject="Ellipse" date="D:20250722151302-07'00'" interior-color="#C544CE" creationdate="D:20250722151255-07'00'"/>
+	</annots>
+	<pages>
+		<defmtx matrix="1,0,0,-1,0,792" />
+	</pages>
+</xfdf>

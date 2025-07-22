@@ -6,17 +6,31 @@ function App() {
   const viewer = useRef(null);
   const [instance, setInstance] = useState(null);
 
+  const xfdfFiles = ["default.xml", "user_1.xml"]
+
   useEffect(() => {
     WebViewer(
       {
         path: '/webviewer/lib',
         initialDoc: '/files/WebviewerDemoDoc.pdf',
-        licenseKey: "demo:1688745488452:7c640dad0300000000ff98c75e9e3a6477a0d966fddd63ac8543da906b",
-        fullAPI: true
       },
       viewer.current,
     ).then((instance) => {
       setInstance(instance);
+ 
+      const { documentViewer, annotationManager } = instance.Core;
+
+      documentViewer.addEventListener('documentLoaded', async () => {
+
+        for(const xfdfFile of xfdfFiles){
+          const response = await fetch(`/xfdf/${xfdfFile}`);
+          const xfdfString = await response.text();
+          await annotationManager.importAnnotations(xfdfString)
+        }
+   
+      });
+
+
     });
   }, []);
 
