@@ -18,6 +18,7 @@
 
     <script src="./webviewer/lib/core/webviewer-core.min.js"></script>
     <script src="./webviewer/lib/core/pdf/PDFNetLean.js"></script>
+    <script src="./webviewer/lib/core/pdf/PDFNet.js"></script>
 
     <title>React App</title>
   </head>
@@ -25,14 +26,31 @@
     <script>
       (async function() {
         Core.setWorkerPath('./webviewer/lib/core');
+
         const licenseKey = 'demo:1701731196462:7ca228c103000000005e46581a1882b46379dc11c8003a58246516df04';
 
-        // perform the conversion with no optional parameters
-        const buf = await Core.officeToPDFBuffer('/files/legal-contract.docx', { l: licenseKey });
-        const blob = new Blob([buf], { type: 'application/pdf' });
+        async function main() {
+          // creates an empty pdf document (PDFDoc)
+          const doc = await Core.PDFNet.PDFDoc.createFromURL("/files/WebviewerDemoDoc.pdf");
+          doc.initSecurityHandler();
 
-        const url = URL.createObjectURL(blob);
-        window.open(url);
+          // getPageCount
+          const pageCount = await doc.getPageCount();
+          const pdfdraw = await Core.PDFNet.PDFDraw.create(92);
+
+          for(var i = 1; i <= pageCount; i++){
+            // Rasterizeeach page in the document and save the result as PNG.
+            const pg = await doc.getPage(i);
+            const buf = await pdfdraw.exportStream(pg, 'PNG');
+
+            //optionally save the blob to a file or upload to a server
+            const blob = new Blob([buf], { type: 'image/png' });
+            const url = URL.createObjectURL(blob);
+            window.open(url);
+          }
+        };
+
+        Core.PDFNet.runWithCleanup(main, licenseKey)
       })()
     </script>
     <noscript>You need to enable JavaScript to run this app.</noscript>
