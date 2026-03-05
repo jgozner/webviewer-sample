@@ -10,68 +10,59 @@ function App() {
     WebViewer(
       {
         path: "/webviewer/lib",
-        initialDoc: "/files/WebviewerDemoDoc.pdf",
-        licenseKey: "demo:1688745488452:7c640dad0300000000ff98c75e9e3a6477a0d966fddd63ac8543da906b",
-        css: "/files/webviewer.css"
+        licenseKey:"demo:1688745488452:7c640dad0300000000ff98c75e9e3a6477a0d966fddd63ac8543da906b",
+        css: "/files/webviewer.css",
+        fullAPI: true
       },
       viewer.current,
-    ).then((instance) => {
+    ).then(async (instance) => {
       setInstance(instance);
 
       const { Core, UI } = instance;
       const { documentViewer } = Core;
-     
-      documentViewer.addEventListener("documentLoaded", () => {
-        //Option 1, modify the zoom for a specific page
-        const documentPageCount = documentViewer.getPageCount();
+
+      //Here we scale
+      const prepareDocument = async () => {
+        await Core.PDFNet.initialize("demo:1688745488452:7c640dad0300000000ff98c75e9e3a6477a0d966fddd63ac8543da906b")
         const pages = [];
         let minWidth = 10000;
 
-        //Loop through all pages
+        const pdfDoc = await Core.PDFNet.PDFDoc.createFromURL("/files/WebviewerDemoDoc.pdf");
+        const documentPageCount = await pdfDoc.getPageCount();
+
         for (var i = 1; i < documentPageCount; i++) {
-          const pageWidth = documentViewer.getPageWidth(i);
-          const pageHeight = documentViewer.getPageHeight(i);
-          const pageRotation = documentViewer.getCompleteRotation(i);
+          const page = await pdfDoc.getPage(i);
+          const pageRotation = await page.getRotation();
+          const pageWidth = await page.getPageWidth();
+          const pageHeight = await page.getPageHeight();
 
           pages.push({
             number: i,
+            rotation: pageRotation,
             width: pageWidth,
             height: pageHeight,
-            rotation: pageRotation,
           });
 
-          if (pageRotation == 0 || pageRotation == 2) {
-            if (pageWidth < minWidth) {
-              minWidth = pageWidth;
-            }
-          } else {
-            if (pageHeight < minWidth) {
-              minWidth = pageHeight;
-            }
+          if (pageWidth < minWidth) {
+            minWidth = pageWidth;
           }
         }
 
-        const pagesUpdated = [];
         for (var i = 0; i < pages.length; i++) {
-          const page = pages[i];
+          const pageInfo = pages[i];
 
-          if (page.rotation == 0 || page.rotation == 2) {
-            const scale = minWidth / page.width;
+          if (pageInfo.width != minWidth) {
+            const scale = minWidth / pageInfo.width;
 
-            documentViewer.setPageZoom(page.number, scale);
-            pagesUpdated.push(page.number);
-          } else {
-            const scale = minWidth / page.height;
-
-            documentViewer.setPageZoom(page.number, scale);
-            pagesUpdated.push(page.number);
+            const page = await pdfDoc.getPage(pageInfo.number);
+            await page.scale(scale)
           }
+      
         }
+        instance.UI.loadDocument(pdfDoc);
+      };
 
-        documentViewer.recalculateLayout(pagesUpdated);
-        documentViewer.updateView();
-      });
- 
+      prepareDocument();
     });
   }, []);
 
